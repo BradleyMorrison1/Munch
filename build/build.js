@@ -10182,7 +10182,7 @@ exports.ASSET_MANIFEST = exports.SNAKE_MAX_SPEED = exports.FRAME_RATE = exports.
 exports.STAGE_WIDTH = 600;
 exports.STAGE_HEIGHT = 600;
 exports.FRAME_RATE = 30;
-exports.SNAKE_MAX_SPEED = 5;
+exports.SNAKE_MAX_SPEED = 1;
 exports.ASSET_MANIFEST = [
     {
         type: "json",
@@ -10237,6 +10237,10 @@ function onReady(e) {
     snake.rotateMe(30);
     snake.showMe();
     snake.startMe();
+    stage.on("snakeKilled", onSnakeDead);
+    snake.sprite.on("click", () => {
+        snake.killMe();
+    });
     createjs.Ticker.framerate = Constants_1.FRAME_RATE;
     createjs.Ticker.on("tick", onTick);
     console.log(">> game ready");
@@ -10245,6 +10249,9 @@ function onTick(e) {
     document.getElementById("fps").innerHTML = String(createjs.Ticker.getMeasuredFPS());
     snake.update();
     stage.update();
+}
+function onSnakeDead(e) {
+    console.log("Snake is dead");
 }
 function main() {
     console.log(">> initializing");
@@ -10317,8 +10324,14 @@ class GameCharacter {
         this._state = GameCharacter.STATE_MOVING;
         console.log(this.xDisplace + ", " + this.yDisplace);
     }
-    update() {
+    stopMe() {
         if (this.state == GameCharacter.STATE_DEAD)
+            return;
+        this._sprite.stop();
+        this._state = GameCharacter.STATE_IDLE;
+    }
+    update() {
+        if ((this.state == GameCharacter.STATE_DEAD) || (this.state == GameCharacter.STATE_IDLE))
             return;
         this._sprite.x += this.xDisplace;
         this._sprite.y += this.yDisplace;
@@ -10346,6 +10359,16 @@ const GameCharacter_1 = __webpack_require__(/*! ./GameCharacter */ "./src/GameCh
 class Snake extends GameCharacter_1.default {
     constructor(stage, assetManager) {
         super(stage, assetManager, "snake/alive");
+        this.eventKilled = new createjs.Event("snakeKilled", true, false);
+    }
+    killMe() {
+        this._state = GameCharacter_1.default.STATE_DEAD;
+        this.stopMe();
+        this._sprite.gotoAndPlay("snake/dead");
+        this._sprite.on("animationend", () => {
+            this._sprite.stop();
+        }, true);
+        this.stage.dispatchEvent(this.eventKilled);
     }
 }
 exports.default = Snake;

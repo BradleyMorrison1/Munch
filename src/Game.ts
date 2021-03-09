@@ -27,7 +27,13 @@ function onReady(e:createjs.Event):void {
     snake.rotateMe(30);
     snake.showMe();
     snake.startMe();
+    //snake.killMe();
 
+    stage.on("snakeKilled", onSnakeDead);
+    
+    snake.sprite.on("click", () => {  // debug for testing killMe function
+        snake.killMe();
+    })    
 
     // startup the ticker
     createjs.Ticker.framerate = FRAME_RATE;
@@ -38,13 +44,17 @@ function onReady(e:createjs.Event):void {
 function onTick(e:createjs.Event):void {
     // TESTING FPS
     document.getElementById("fps").innerHTML = String(createjs.Ticker.getMeasuredFPS());
-
+    
     // This is your game loop :)
     snake.update();
-
-
+    
     // update the stage!
     stage.update();
+}
+
+function onSnakeDead(e:createjs.Event):void {
+    console.log("Snake is dead");
+
 }
 
 // --------------------------------------------------- main method

@@ -82,8 +82,16 @@ export default class GameCharacter {
         console.log(this.xDisplace + ", " + this.yDisplace);
     }
     
-    public update():void {
+    public stopMe():void {
         if(this.state == GameCharacter.STATE_DEAD) return;
+
+        this._sprite.stop();
+        this._state = GameCharacter.STATE_IDLE;
+    }
+    
+    public update():void {
+        if ((this.state == GameCharacter.STATE_DEAD) || (this.state == GameCharacter.STATE_IDLE))return;
+
         this._sprite.x += this.xDisplace;
         this._sprite.y += this.yDisplace;
     }
