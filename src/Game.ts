@@ -24,6 +24,7 @@ function onReady(e:createjs.Event):void {
     
     // construct game object sprites
     snake = new Snake(stage, assetManager);
+    snake.rotateMe(0);
     snake.showMe();
 
 

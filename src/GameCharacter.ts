@@ -12,6 +12,9 @@ export default class GameCharacter {
     protected _speed:number;
     protected _state:number;
     protected _sprite:createjs.Sprite;
+    // the x and y displacement of the sprite per tick
+    protected xDisplace:number;
+    protected yDisplace:number;
 
 
     // protected variables
@@ -22,6 +25,8 @@ export default class GameCharacter {
         this._speed = SNAKE_MAX_SPEED;
         this._state = GameCharacter.STATE_IDLE;
         this.stage = stage;
+        this.xDisplace = 0;
+        this.yDisplace = 0;
 
         this._sprite = assetManager.getSprite("sprites", animation, 300, 300);
     }
@@ -43,12 +48,31 @@ export default class GameCharacter {
         return this._state;
     }
 
+    // -------------------------------------------------------------- protected method
+    protected toRadians(degrees:number):number {
+        return degrees * (Math.PI / 180);
+    }
+
     // -------------------------------------------------------------- public methods
     public showMe():void {
         this.stage.addChild(this._sprite);
     }
+
     public hideMe():void {
         this.stage.removeChild(this._sprite);
+    }
+
+    public rotateMe(degrees:number):void {
+        if(this.state == GameCharacter.STATE_DEAD) return;
+        
+        // rotate the sprite
+        this.sprite.rotation = degrees;
+    }
+    
+    public startMe():void {
+        if(this.state == GameCharacter.STATE_DEAD) return;
+        
+        
     }
     
 

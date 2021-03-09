@@ -10226,11 +10226,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __webpack_require__(/*! createjs */ "./node_modules/createjs/builds/1.0.0/createjs.min.js");
 const Constants_1 = __webpack_require__(/*! ./Constants */ "./src/Constants.ts");
 const AssetManager_1 = __webpack_require__(/*! ./AssetManager */ "./src/AssetManager.ts");
+const Snake_1 = __webpack_require__(/*! ./Snake */ "./src/Snake.ts");
 let stage;
 let canvas;
 let assetManager;
+let snake;
 function onReady(e) {
     console.log(">> adding sprites to game");
+    snake = new Snake_1.default(stage, assetManager);
+    snake.rotateMe(0);
+    snake.showMe();
     createjs.Ticker.framerate = Constants_1.FRAME_RATE;
     createjs.Ticker.on("tick", onTick);
     console.log(">> game ready");
@@ -10250,6 +10255,86 @@ function main() {
     assetManager.loadAssets(Constants_1.ASSET_MANIFEST);
 }
 main();
+
+
+/***/ }),
+
+/***/ "./src/GameCharacter.ts":
+/*!******************************!*\
+  !*** ./src/GameCharacter.ts ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const Constants_1 = __webpack_require__(/*! ./Constants */ "./src/Constants.ts");
+class GameCharacter {
+    constructor(stage, assetManager, animation) {
+        this._speed = Constants_1.SNAKE_MAX_SPEED;
+        this._state = GameCharacter.STATE_IDLE;
+        this.stage = stage;
+        this.xDisplace = 0;
+        this.yDisplace = 0;
+        this._sprite = assetManager.getSprite("sprites", animation, 300, 300);
+    }
+    set speed(value) {
+        this.speed = value;
+    }
+    get speed() {
+        return this._speed;
+    }
+    get sprite() {
+        return this._sprite;
+    }
+    get state() {
+        return this._state;
+    }
+    toRadians(degrees) {
+        return degrees * (Math.PI / 180);
+    }
+    showMe() {
+        this.stage.addChild(this._sprite);
+    }
+    hideMe() {
+        this.stage.removeChild(this._sprite);
+    }
+    rotateMe(degrees) {
+        if (this.state == GameCharacter.STATE_DEAD)
+            return;
+        this.sprite.rotation = degrees;
+    }
+    startMe() {
+        if (this.state == GameCharacter.STATE_DEAD)
+            return;
+    }
+}
+exports.default = GameCharacter;
+GameCharacter.STATE_IDLE = 1;
+GameCharacter.STATE_MOVING = 2;
+GameCharacter.STATE_DEAD = 3;
+
+
+/***/ }),
+
+/***/ "./src/Snake.ts":
+/*!**********************!*\
+  !*** ./src/Snake.ts ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GameCharacter_1 = __webpack_require__(/*! ./GameCharacter */ "./src/GameCharacter.ts");
+class Snake extends GameCharacter_1.default {
+    constructor(stage, assetManager) {
+        super(stage, assetManager, "snake/alive");
+    }
+}
+exports.default = Snake;
 
 
 /***/ }),
