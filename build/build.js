@@ -10234,14 +10234,16 @@ let snake;
 function onReady(e) {
     console.log(">> adding sprites to game");
     snake = new Snake_1.default(stage, assetManager);
-    snake.rotateMe(0);
+    snake.rotateMe(30);
     snake.showMe();
+    snake.startMe();
     createjs.Ticker.framerate = Constants_1.FRAME_RATE;
     createjs.Ticker.on("tick", onTick);
     console.log(">> game ready");
 }
 function onTick(e) {
     document.getElementById("fps").innerHTML = String(createjs.Ticker.getMeasuredFPS());
+    snake.update();
     stage.update();
 }
 function main() {
@@ -10308,6 +10310,18 @@ class GameCharacter {
     startMe() {
         if (this.state == GameCharacter.STATE_DEAD)
             return;
+        let radians = this.toRadians(this._sprite.rotation);
+        this.xDisplace = Math.cos(radians) * this._speed;
+        this.yDisplace = Math.sin(radians) * this._speed;
+        this._sprite.play();
+        this._state = GameCharacter.STATE_MOVING;
+        console.log(this.xDisplace + ", " + this.yDisplace);
+    }
+    update() {
+        if (this.state == GameCharacter.STATE_DEAD)
+            return;
+        this._sprite.x += this.xDisplace;
+        this._sprite.y += this.yDisplace;
     }
 }
 exports.default = GameCharacter;

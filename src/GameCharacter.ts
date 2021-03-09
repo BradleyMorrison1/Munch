@@ -72,8 +72,20 @@ export default class GameCharacter {
     public startMe():void {
         if(this.state == GameCharacter.STATE_DEAD) return;
         
+        let radians:number = this.toRadians(this._sprite.rotation);
+        // calculate the x and y displacement for diagonal movment
+        this.xDisplace = Math.cos(radians) * this._speed;
+        this.yDisplace = Math.sin(radians) * this._speed;
+        this._sprite.play();
+        this._state = GameCharacter.STATE_MOVING;
         
+        console.log(this.xDisplace + ", " + this.yDisplace);
     }
     
+    public update():void {
+        if(this.state == GameCharacter.STATE_DEAD) return;
+        this._sprite.x += this.xDisplace;
+        this._sprite.y += this.yDisplace;
+    }
 
 }

@@ -24,8 +24,9 @@ function onReady(e:createjs.Event):void {
     
     // construct game object sprites
     snake = new Snake(stage, assetManager);
-    snake.rotateMe(0);
+    snake.rotateMe(30);
     snake.showMe();
+    snake.startMe();
 
 
     // startup the ticker
@@ -39,7 +40,8 @@ function onTick(e:createjs.Event):void {
     document.getElementById("fps").innerHTML = String(createjs.Ticker.getMeasuredFPS());
 
     // This is your game loop :)
-    // ...
+    snake.update();
+
 
     // update the stage!
     stage.update();
