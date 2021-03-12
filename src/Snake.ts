@@ -15,11 +15,10 @@ export default class Snake extends GameCharacter {
 
     public killMe():void {
         this._state = GameCharacter.STATE_DEAD;
-        this.stopMe();
         this._sprite.gotoAndPlay("snake/dead");
         this._sprite.on("animationend", () => {
             this._sprite.stop();
+            this.stage.dispatchEvent(this.eventKilled);
         },true);
-        this.stage.dispatchEvent(this.eventKilled);
     }
 }

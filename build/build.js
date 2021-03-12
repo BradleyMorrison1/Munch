@@ -10237,10 +10237,8 @@ function onReady(e) {
     snake.rotateMe(30);
     snake.showMe();
     snake.startMe();
+    snake.killMe();
     stage.on("snakeKilled", onSnakeDead);
-    snake.sprite.on("click", () => {
-        snake.killMe();
-    });
     createjs.Ticker.framerate = Constants_1.FRAME_RATE;
     createjs.Ticker.on("tick", onTick);
     console.log(">> game ready");
@@ -10363,12 +10361,11 @@ class Snake extends GameCharacter_1.default {
     }
     killMe() {
         this._state = GameCharacter_1.default.STATE_DEAD;
-        this.stopMe();
         this._sprite.gotoAndPlay("snake/dead");
         this._sprite.on("animationend", () => {
             this._sprite.stop();
+            this.stage.dispatchEvent(this.eventKilled);
         }, true);
-        this.stage.dispatchEvent(this.eventKilled);
     }
 }
 exports.default = Snake;

@@ -27,13 +27,10 @@ function onReady(e:createjs.Event):void {
     snake.rotateMe(30);
     snake.showMe();
     snake.startMe();
-    //snake.killMe();
+    snake.killMe();
 
     stage.on("snakeKilled", onSnakeDead);
     
-    snake.sprite.on("click", () => {  // debug for testing killMe function
-        snake.killMe();
-    })    
 
     // startup the ticker
     createjs.Ticker.framerate = FRAME_RATE;
