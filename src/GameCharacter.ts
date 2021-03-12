@@ -53,6 +53,9 @@ export default class GameCharacter {
         return degrees * (Math.PI / 180);
     }
 
+    protected toDegrees(radians:number):number {
+        return (radians *(180/Math.PI));
+    }
     // -------------------------------------------------------------- public methods
     public showMe():void {
         this.stage.addChild(this._sprite);

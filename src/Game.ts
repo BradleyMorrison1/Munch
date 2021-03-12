@@ -17,25 +17,34 @@ let assetManager:AssetManager;
 
 // game objects
 let snake:Snake;
+let background:createjs.Sprite;
 
 // --------------------------------------------------- event handlers
 function onReady(e:createjs.Event):void {
     console.log(">> adding sprites to game");
     
     // construct game object sprites
+    background = assetManager.getSprite("sprites", "misc/backgroundGame");
+    stage.addChild(background);
+
     snake = new Snake(stage, assetManager);
-    snake.rotateMe(30);
     snake.showMe();
-    snake.startMe();
-    snake.killMe();
-
-    stage.on("snakeKilled", onSnakeDead);
+    //snake.startMe();
     
-
+    
+    // listen on the stage for clicks
+    stage.on("mousedown", onMoveSnake);
+    
+    stage.on("snakeKilled", onSnakeDead);
     // startup the ticker
     createjs.Ticker.framerate = FRAME_RATE;
     createjs.Ticker.on("tick", onTick);        
     console.log(">> game ready");
+}
+
+function onMoveSnake(e:createjs.Event) {
+    snake.rotateMe();
+    snake.startMe();
 }
 
 function onTick(e:createjs.Event):void {

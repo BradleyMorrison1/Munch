@@ -10182,7 +10182,7 @@ exports.ASSET_MANIFEST = exports.SNAKE_MAX_SPEED = exports.FRAME_RATE = exports.
 exports.STAGE_WIDTH = 600;
 exports.STAGE_HEIGHT = 600;
 exports.FRAME_RATE = 30;
-exports.SNAKE_MAX_SPEED = 1;
+exports.SNAKE_MAX_SPEED = 5;
 exports.ASSET_MANIFEST = [
     {
         type: "json",
@@ -10231,17 +10231,22 @@ let stage;
 let canvas;
 let assetManager;
 let snake;
+let background;
 function onReady(e) {
     console.log(">> adding sprites to game");
+    background = assetManager.getSprite("sprites", "misc/backgroundGame");
+    stage.addChild(background);
     snake = new Snake_1.default(stage, assetManager);
-    snake.rotateMe(30);
     snake.showMe();
-    snake.startMe();
-    snake.killMe();
+    stage.on("mousedown", onMoveSnake);
     stage.on("snakeKilled", onSnakeDead);
     createjs.Ticker.framerate = Constants_1.FRAME_RATE;
     createjs.Ticker.on("tick", onTick);
     console.log(">> game ready");
+}
+function onMoveSnake(e) {
+    snake.rotateMe();
+    snake.startMe();
 }
 function onTick(e) {
     document.getElementById("fps").innerHTML = String(createjs.Ticker.getMeasuredFPS());
@@ -10301,6 +10306,9 @@ class GameCharacter {
     toRadians(degrees) {
         return degrees * (Math.PI / 180);
     }
+    toDegrees(radians) {
+        return (radians * (180 / Math.PI));
+    }
     showMe() {
         this.stage.addChild(this._sprite);
     }
@@ -10359,6 +10367,12 @@ class Snake extends GameCharacter_1.default {
         super(stage, assetManager, "snake/alive");
         this.eventKilled = new createjs.Event("snakeKilled", true, false);
     }
+    rotateMe() {
+        this.mouseX = this.stage.mouseX;
+        this.mouseY = this.stage.mouseY;
+        let radians = Math.atan2((this.mouseY - this._sprite.y), (this.mouseX - this._sprite.x));
+        super.rotateMe(this.toDegrees(radians));
+    }
     killMe() {
         this._state = GameCharacter_1.default.STATE_DEAD;
         this._sprite.gotoAndPlay("snake/dead");
@@ -10366,6 +10380,14 @@ class Snake extends GameCharacter_1.default {
             this._sprite.stop();
             this.stage.dispatchEvent(this.eventKilled);
         }, true);
+    }
+    update() {
+        if (this._state != GameCharacter_1.default.STATE_MOVING)
+            return;
+        super.update();
+        if ((Math.abs(this._sprite.x - this.mouseX) < 10) && (Math.abs(this._sprite.y - this.mouseY) < 15)) {
+            this.stopMe();
+        }
     }
 }
 exports.default = Snake;
