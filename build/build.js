@@ -10168,6 +10168,27 @@ exports.default = AssetManager;
 
 /***/ }),
 
+/***/ "./src/Bug.ts":
+/*!********************!*\
+  !*** ./src/Bug.ts ***!
+  \********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GameCharacter_1 = __webpack_require__(/*! ./GameCharacter */ "./src/GameCharacter.ts");
+class Snake extends GameCharacter_1.default {
+    constructor(stage, assetManager) {
+        super(stage, assetManager, "bug/alive");
+    }
+}
+exports.default = Snake;
+
+
+/***/ }),
+
 /***/ "./src/Constants.ts":
 /*!**************************!*\
   !*** ./src/Constants.ts ***!
@@ -10178,11 +10199,12 @@ exports.default = AssetManager;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ASSET_MANIFEST = exports.SNAKE_MAX_SPEED = exports.FRAME_RATE = exports.STAGE_HEIGHT = exports.STAGE_WIDTH = void 0;
+exports.ASSET_MANIFEST = exports.SNAKE_SLOW_DELAY = exports.SNAKE_MAX_SPEED = exports.FRAME_RATE = exports.STAGE_HEIGHT = exports.STAGE_WIDTH = void 0;
 exports.STAGE_WIDTH = 600;
 exports.STAGE_HEIGHT = 600;
 exports.FRAME_RATE = 30;
 exports.SNAKE_MAX_SPEED = 5;
+exports.SNAKE_SLOW_DELAY = 5000;
 exports.ASSET_MANIFEST = [
     {
         type: "json",
@@ -10227,17 +10249,24 @@ __webpack_require__(/*! createjs */ "./node_modules/createjs/builds/1.0.0/create
 const Constants_1 = __webpack_require__(/*! ./Constants */ "./src/Constants.ts");
 const AssetManager_1 = __webpack_require__(/*! ./AssetManager */ "./src/AssetManager.ts");
 const Snake_1 = __webpack_require__(/*! ./Snake */ "./src/Snake.ts");
+const Bug_1 = __webpack_require__(/*! ./Bug */ "./src/Bug.ts");
 let stage;
 let canvas;
 let assetManager;
 let snake;
+let bug;
 let background;
 function onReady(e) {
     console.log(">> adding sprites to game");
     background = assetManager.getSprite("sprites", "misc/backgroundGame");
     stage.addChild(background);
     snake = new Snake_1.default(stage, assetManager);
+    snake.startSlowDown();
     snake.showMe();
+    bug = new Bug_1.default(stage, assetManager);
+    bug.rotateMe(225);
+    bug.showMe();
+    bug.startMe();
     stage.on("mousedown", onMoveSnake);
     stage.on("snakeKilled", onSnakeDead);
     createjs.Ticker.framerate = Constants_1.FRAME_RATE;
@@ -10251,6 +10280,7 @@ function onMoveSnake(e) {
 function onTick(e) {
     document.getElementById("fps").innerHTML = String(createjs.Ticker.getMeasuredFPS());
     snake.update();
+    bug.update();
     stage.update();
 }
 function onSnakeDead(e) {
@@ -10361,11 +10391,24 @@ GameCharacter.STATE_DEAD = 3;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const Constants_1 = __webpack_require__(/*! ./Constants */ "./src/Constants.ts");
 const GameCharacter_1 = __webpack_require__(/*! ./GameCharacter */ "./src/GameCharacter.ts");
 class Snake extends GameCharacter_1.default {
     constructor(stage, assetManager) {
         super(stage, assetManager, "snake/alive");
         this.eventKilled = new createjs.Event("snakeKilled", true, false);
+        this.eventSpeedChange = new createjs.Event("snakeSpeedChange", true, false);
+    }
+    onSlowDown() {
+        this._speed--;
+        this.sprite.dispatchEvent(this.eventSpeedChange);
+        console.log("Snake slowed: " + this._speed);
+        if (this._speed <= 0) {
+            this.killMe();
+        }
+    }
+    startSlowDown() {
+        this.slowDownTimer = window.setInterval(() => this.onSlowDown(), Constants_1.SNAKE_SLOW_DELAY);
     }
     rotateMe() {
         this.mouseX = this.stage.mouseX;
@@ -10375,11 +10418,20 @@ class Snake extends GameCharacter_1.default {
     }
     killMe() {
         this._state = GameCharacter_1.default.STATE_DEAD;
+        window.clearInterval(this.slowDownTimer);
         this._sprite.gotoAndPlay("snake/dead");
         this._sprite.on("animationend", () => {
             this._sprite.stop();
             this.stage.dispatchEvent(this.eventKilled);
         }, true);
+    }
+    resetMe() {
+        this._sprite.gotoAndStop("snake/alive");
+        this._sprite.x = 300;
+        this._sprite.y = 300;
+        this._sprite.rotation = 0;
+        this._speed = Constants_1.SNAKE_MAX_SPEED;
+        this._state = GameCharacter_1.default.STATE_IDLE;
     }
     update() {
         if (this._state != GameCharacter_1.default.STATE_MOVING)

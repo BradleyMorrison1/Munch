@@ -7,6 +7,7 @@ import "createjs";
 import { STAGE_WIDTH, STAGE_HEIGHT, FRAME_RATE, ASSET_MANIFEST, SNAKE_MAX_SPEED } from "./Constants";
 import AssetManager from "./AssetManager";
 import Snake from "./Snake";
+import Bug from "./Bug";
 
 // game variables
 let stage:createjs.StageGL;
@@ -17,6 +18,7 @@ let assetManager:AssetManager;
 
 // game objects
 let snake:Snake;
+let bug:Bug;
 let background:createjs.Sprite;
 
 // --------------------------------------------------- event handlers
@@ -28,9 +30,15 @@ function onReady(e:createjs.Event):void {
     stage.addChild(background);
 
     snake = new Snake(stage, assetManager);
+    snake.startSlowDown();
     snake.showMe();
     //snake.startMe();
     
+    bug = new Bug(stage, assetManager);
+    bug.rotateMe(225);
+    bug.showMe();
+    bug.startMe();
+
     
     // listen on the stage for clicks
     stage.on("mousedown", onMoveSnake);
@@ -53,7 +61,8 @@ function onTick(e:createjs.Event):void {
     
     // This is your game loop :)
     snake.update();
-    
+
+    bug.update();
     // update the stage!
     stage.update();
 }
